@@ -20,10 +20,7 @@ void initializeFlights()
 }
 
 
-/*
-Seat class - stores whether a seat is booked
-and the passenger name
-*/
+// - seat: booked flag + passenger name
 class Seat
 {
 public:
@@ -38,11 +35,7 @@ public:
 };
 
 
-/*
-Flight class - stores flight info and
-an array of seats. Has methods for
-display, seat map, and availability.
-*/
+// - flight: info, seat array, display/availability methods
 class Flight
 {
 public:
@@ -102,7 +95,6 @@ public:
 
         for (int i = 0; i < capacity; i++)
         {
-            // add space before single digit numbers for alignment
             int seatNum = i + 1;
 
             if (seatNum < 10)
@@ -112,7 +104,6 @@ public:
 
             cout << seatNum;
 
-            // show X if booked, empty if available
             if (seats[i].booked == true)
             {
                 cout << "[X]  ";
@@ -122,7 +113,7 @@ public:
                 cout << "[ ]  ";
             }
 
-            // new line after every 4 seats
+            // newline every 4 seats
             if (seatNum % 4 == 0)
             {
                 cout << endl;
@@ -156,24 +147,20 @@ int bookingCount = 0;
 int pnrCounter = 1001;
 
 
-// input validation for integers
+// - validates integer input, re-prompts on bad input
 int getIntInput()
 {
     int value;
-
-    // keep asking until user enters a valid number
     bool valid = false;
 
     while (valid == false)
     {
         if (cin >> value)
         {
-            // input was a valid number
             valid = true;
         }
         else
         {
-            // clear the error and discard bad input
             cin.clear();
             cin.ignore(1000, '\n');
             cout << "Invalid input. Enter a number: ";
@@ -214,7 +201,6 @@ int countPassengerBookings(int flightNum, string name)
 
     for (int i = 0; i < bookingCount; i++)
     {
-        // check if this booking matches both flight and passenger
         bool sameFlght = (bookingFlight[i] == flightNum);
         bool sameName = (bookingPassenger[i] == name);
 
@@ -272,7 +258,6 @@ int main()
 
             for (int i = 0; i < flightCount; i++)
             {
-                // check if city matches source or destination
                 bool matchSource = (flights[i].source == city);
                 bool matchDest = (flights[i].destination == city);
 
@@ -326,22 +311,19 @@ int main()
             {
                 if (flights[index].seats[j].booked == false)
                 {
-                    // mark the seat as booked
                     flights[index].seats[j].booked = true;
                     flights[index].seats[j].passengerName = name;
 
-                    // generate a unique PNR
                     string pnr = generatePNR();
                     int seatNum = j + 1;
 
-                    // save booking record
+                    // save booking
                     bookingPNR[bookingCount] = pnr;
                     bookingFlight[bookingCount] = num;
                     bookingSeat[bookingCount] = seatNum;
                     bookingPassenger[bookingCount] = name;
                     bookingCount++;
 
-                    // show confirmation
                     cout << endl;
                     cout << "Flight Booked Successfully" << endl;
                     cout << "PNR: " << pnr << endl;
@@ -366,11 +348,10 @@ int main()
             {
                 if (bookingPNR[i] == pnr)
                 {
-                    // get the flight and seat info from this booking
                     int bookedFlight = bookingFlight[i];
                     int bookedSeat = bookingSeat[i];
 
-                    // free the seat in the flight
+                    // free seat
                     int idx = findFlight(bookedFlight);
 
                     if (idx != -1)
@@ -380,7 +361,7 @@ int main()
                         flights[idx].seats[seatIndex].passengerName = "";
                     }
 
-                    // remove this booking by shifting remaining bookings up
+                    // shift bookings left
                     for (int j = i; j < bookingCount - 1; j++)
                     {
                         bookingPNR[j] = bookingPNR[j + 1];
