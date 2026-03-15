@@ -45,9 +45,9 @@ int getIntInput()
 
 string normalizePnr(string s)
 {
-    for (char &ch : s)
+    for (int i = 0; i < s.size(); i++)
     {
-        ch = static_cast<char>(toupper(static_cast<unsigned char>(ch)));
+        s[i] = toupper(s[i]);
     }
     return s;
 }
@@ -86,8 +86,6 @@ int countPassengerBookings(int fltNo, string pax)
 
     return count;
 }
-
-
 
 
 int main()
