@@ -1,4 +1,5 @@
 #include "Airline.h"
+#include <iostream>
 #include <sstream>
 #include <cctype>
 using namespace std;
@@ -6,7 +7,7 @@ using namespace std;
 string bkPnr[MAX_BOOKINGS];
 int bkFlt[MAX_BOOKINGS];
 int bkSeat[MAX_BOOKINGS];
-string bkPax[MAX_BOOKINGS];
+string bkPass[MAX_BOOKINGS];
 
 Flight flights[MAX_FLIGHTS];
 int fltCnt = 0;
@@ -75,7 +76,7 @@ int countPassengerBookings(int fltNo, string pax)
     for (int i = 0; i < bkCnt; i++)
     {
         bool sameFlght = (bkFlt[i] == fltNo);
-        bool sameName = (bkPax[i] == pax);
+        bool sameName = (bkPass[i] == pax);
 
         if (sameFlght && sameName)
         {
@@ -191,7 +192,7 @@ int main()
                     bkPnr[bkCnt] = pnr;
                     bkFlt[bkCnt] = fltNo;
                     bkSeat[bkCnt] = seatNum;
-                    bkPax[bkCnt] = pax;
+                    bkPass[bkCnt] = pax;
                     bkCnt++;
 
                     cout << endl;
@@ -238,7 +239,7 @@ int main()
                         bkPnr[j] = bkPnr[j + 1];
                         bkFlt[j] = bkFlt[j + 1];
                         bkSeat[j] = bkSeat[j + 1];
-                        bkPax[j] = bkPax[j + 1];
+                        bkPass[j] = bkPass[j + 1];
                     }
 
                     bkCnt--;
@@ -288,7 +289,7 @@ int main()
 
             for (int i = 0; i < bkCnt; i++)
             {
-                if (bkPax[i] == pax)
+                if (bkPass[i] == pax)
                 {
                     cout << "PNR: " << bkPnr[i] << " | Flight: " << bkFlt[i] << " | Seat: " << bkSeat[i] << endl;
                     found = true;
