@@ -14,41 +14,41 @@ class Seat
 {
 public:
     bool booked;
-    string passengerName;
+    string paxNm;
 
     Seat()
     {
         booked = false;
-        passengerName = "";
+        paxNm = "";
     }
 };
 
 class Flight
 {
 public:
-    int flightNumber;
-    string source;
-    string destination;
-    int capacity;
+    int fltNo;
+    string src;
+    string dst;
+    int cap;
     Seat seats[MAX_SEATS];
 
     Flight()
     {
-        flightNumber = 0;
-        capacity = 0;
+        fltNo = 0;
+        cap = 0;
     }
 
     void initialize(int num, string src, string dest, int cap)
     {
-        flightNumber = num;
-        source = src;
-        destination = dest;
-        capacity = cap;
+        fltNo = num;
+        this->src = src;
+        dst = dest;
+        this->cap = cap;
 
-        for (int i = 0; i < capacity; i++)
+        for (int i = 0; i < this->cap; i++)
         {
             seats[i].booked = false;
-            seats[i].passengerName = "";
+            seats[i].paxNm = "";
         }
     }
 
@@ -56,7 +56,7 @@ public:
     {
         int count = 0;
 
-        for (int i = 0; i < capacity; i++)
+        for (int i = 0; i < cap; i++)
         {
             if (seats[i].booked == false)
             {
@@ -69,18 +69,18 @@ public:
 
     void displayInfo()
     {
-        cout << "\nFlight: " << flightNumber << endl;
-        cout << source << " -> " << destination << endl;
-        cout << "Seat Capacity: " << capacity << endl;
+        cout << "\nFlight: " << fltNo << endl;
+        cout << src << " -> " << dst << endl;
+        cout << "Seat Capacity: " << cap << endl;
         cout << "Available Seats: " << countAvailable() << endl;
     }
 
     void showSeatMap()
     {
-        cout << "\nSeat Map for Flight " << flightNumber << ":" << endl;
+        cout << "\nSeat Map for Flight " << fltNo << ":" << endl;
         cout << endl;
 
-        for (int i = 0; i < capacity; i++)
+        for (int i = 0; i < cap; i++)
         {
             int seatNum = i + 1;
 
@@ -116,27 +116,3 @@ public:
     }
 };
 
-inline string bookingPNR[MAX_BOOKINGS];
-inline int bookingFlight[MAX_BOOKINGS];
-inline int bookingSeat[MAX_BOOKINGS];
-inline string bookingPassenger[MAX_BOOKINGS];
-
-inline Flight flights[MAX_FLIGHTS];
-inline int flightCount = 0;
-inline int bookingCount = 0;
-inline int pnrCounter = 1001;
-
-inline void initializeFlights()
-{
-    flights[0].initialize(101, "Delhi", "Mumbai", 16);
-    flights[1].initialize(102, "Mumbai", "Bangalore", 16);
-    flights[2].initialize(103, "Delhi", "Chennai", 16);
-    flights[3].initialize(104, "Kolkata", "Delhi", 16);
-    flights[4].initialize(105, "Bangalore", "Hyderabad", 16);
-    flightCount = 5;
-}
-
-int getIntInput();
-int findFlight(int num);
-string generatePNR();
-int countPassengerBookings(int flightNum, string name);

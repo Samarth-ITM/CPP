@@ -1,61 +1,81 @@
 #include "Airline.h"
+#include <sstream>
+#include <cctype>
 using namespace std;
 
-// - validates integer input, re-prompts on bad input
-int getIntInput()
+string bkPnr[MAX_BOOKINGS];
+int bkFlt[MAX_BOOKINGS];
+int bkSeat[MAX_BOOKINGS];
+string bkPax[MAX_BOOKINGS];
+
+Flight flights[MAX_FLIGHTS];
+int fltCnt = 0;
+int bkCnt = 0;
+int pnrCtr = 1001;
+
+void initializeFlights()
 {
-    int value;
-    bool valid = false;
-
-    while (valid == false)
-    {
-        if (cin >> value)
-        {
-            valid = true;
-        }
-        else
-        {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << "Invalid input. Enter a number: ";
-        }
-    }
-
-    return value;
+    flights[0].initialize(101, "Delhi", "Mumbai", 16);
+    flights[1].initialize(102, "Mumbai", "Bangalore", 16);
+    flights[2].initialize(103, "Delhi", "Chennai", 16);
+    flights[3].initialize(104, "Kolkata", "Delhi", 16);
+    flights[4].initialize(105, "Bangalore", "Hyderabad", 16);
+    fltCnt = 5;
 }
 
-
-
-// find flight index by number
-int findFlight(int num)
+int getIntInput()
 {
-    for (int i = 0; i < flightCount; i++)
+    while (true)
     {
-        if (flights[i].flightNumber == num)
+        string line;
+        getline(cin, line);
+
+        stringstream ss(line);
+        int val;
+
+        if (ss >> val)
+        {
+            return val;
+        }
+
+        cout << "Invalid number. Try again.\n";
+    }
+}
+
+string normalizePnr(string s)
+{
+    for (char &ch : s)
+    {
+        ch = static_cast<char>(toupper(static_cast<unsigned char>(ch)));
+    }
+    return s;
+}
+
+int findFlight(int fltNo)
+{
+    for (int i = 0; i < fltCnt; i++)
+    {
+        if (flights[i].fltNo == fltNo)
             return i;
     }
     return -1;
 }
 
-
-// generate unique PNR
 string generatePNR()
 {
-    string pnr = "PNR" + to_string(pnrCounter);
-    pnrCounter++;
+    string pnr = "PNR" + to_string(pnrCtr);
+    pnrCtr++;
     return pnr;
 }
 
-
-// count bookings for a passenger on a specific flight
-int countPassengerBookings(int flightNum, string name)
+int countPassengerBookings(int fltNo, string pax)
 {
     int count = 0;
 
-    for (int i = 0; i < bookingCount; i++)
+    for (int i = 0; i < bkCnt; i++)
     {
-        bool sameFlght = (bookingFlight[i] == flightNum);
-        bool sameName = (bookingPassenger[i] == name);
+        bool sameFlght = (bkFlt[i] == fltNo);
+        bool sameName = (bkPax[i] == pax);
 
         if (sameFlght && sameName)
         {
@@ -73,8 +93,6 @@ int main()
 {
     initializeFlights();
 
-    int choice;
-
     while (true)
     {
         cout << "\n PROJECT AIRLINE \n";
@@ -86,8 +104,7 @@ int main()
         cout << "6. Your Profile\n";
         cout << "7. Exit\n";
         cout << "Enter choice: ";
-
-        choice = getIntInput();
+        int choice = getIntInput();
 
 
         // 1. View all flights
@@ -95,7 +112,7 @@ int main()
         {
             cout << "\n--- Flight Schedule ---\n";
 
-            for (int i = 0; i < flightCount; i++)
+            for (int i = 0; i < fltCnt; i++)
                 flights[i].displayInfo();
         }
 
@@ -103,16 +120,16 @@ int main()
         // 2. Search flights by city
         else if (choice == 2)
         {
-            string city;
             cout << "\nEnter City (Source or Destination): ";
-            cin >> city;
+            string city;
+            getline(cin, city);
 
             bool found = false;
 
-            for (int i = 0; i < flightCount; i++)
+            for (int i = 0; i < fltCnt; i++)
             {
-                bool matchSource = (flights[i].source == city);
-                bool matchDest = (flights[i].destination == city);
+                bool matchSource = (flights[i].src == city);
+                bool matchDest = (flights[i].dst == city);
 
                 if (matchSource || matchDest)
                 {
@@ -132,9 +149,9 @@ int main()
         else if (choice == 3)
         {
             cout << "\nEnter Flight Number: ";
-            int num = getIntInput();
+            int fltNo = getIntInput();
 
-            int index = findFlight(num);
+            int index = findFlight(fltNo);
 
             if (index == -1)
             {
@@ -149,33 +166,33 @@ int main()
             }
 
             cout << "Enter Passenger Name: ";
-            string name;
-            getline(cin, name);
+            string pax;
+            getline(cin, pax);
 
             // booking limit check
-            if (countPassengerBookings(num, name) >= BOOKING_LIMIT)
+            if (countPassengerBookings(fltNo, pax) >= BOOKING_LIMIT)
             {
                 cout << "Booking Limit Reached! Max " << BOOKING_LIMIT << " bookings per passenger per flight.\n";
                 continue;
             }
 
             // find first available seat and book it
-            for (int j = 0; j < flights[index].capacity; j++)
+            for (int j = 0; j < flights[index].cap; j++)
             {
                 if (flights[index].seats[j].booked == false)
                 {
                     flights[index].seats[j].booked = true;
-                    flights[index].seats[j].passengerName = name;
+                    flights[index].seats[j].paxNm = pax;
 
                     string pnr = generatePNR();
                     int seatNum = j + 1;
 
                     // save booking
-                    bookingPNR[bookingCount] = pnr;
-                    bookingFlight[bookingCount] = num;
-                    bookingSeat[bookingCount] = seatNum;
-                    bookingPassenger[bookingCount] = name;
-                    bookingCount++;
+                    bkPnr[bkCnt] = pnr;
+                    bkFlt[bkCnt] = fltNo;
+                    bkSeat[bkCnt] = seatNum;
+                    bkPax[bkCnt] = pax;
+                    bkCnt++;
 
                     cout << endl;
                     cout << "Flight Booked Successfully" << endl;
@@ -193,16 +210,17 @@ int main()
         {
             cout << "\nEnter PNR: ";
             string pnr;
-            cin >> pnr;
+            getline(cin, pnr);
+            pnr = normalizePnr(pnr);
 
             bool found = false;
 
-            for (int i = 0; i < bookingCount; i++)
+            for (int i = 0; i < bkCnt; i++)
             {
-                if (bookingPNR[i] == pnr)
+                if (bkPnr[i] == pnr)
                 {
-                    int bookedFlight = bookingFlight[i];
-                    int bookedSeat = bookingSeat[i];
+                    int bookedFlight = bkFlt[i];
+                    int bookedSeat = bkSeat[i];
 
                     // free seat
                     int idx = findFlight(bookedFlight);
@@ -211,19 +229,19 @@ int main()
                     {
                         int seatIndex = bookedSeat - 1;
                         flights[idx].seats[seatIndex].booked = false;
-                        flights[idx].seats[seatIndex].passengerName = "";
+                        flights[idx].seats[seatIndex].paxNm = "";
                     }
 
                     // shift bookings left
-                    for (int j = i; j < bookingCount - 1; j++)
+                    for (int j = i; j < bkCnt - 1; j++)
                     {
-                        bookingPNR[j] = bookingPNR[j + 1];
-                        bookingFlight[j] = bookingFlight[j + 1];
-                        bookingSeat[j] = bookingSeat[j + 1];
-                        bookingPassenger[j] = bookingPassenger[j + 1];
+                        bkPnr[j] = bkPnr[j + 1];
+                        bkFlt[j] = bkFlt[j + 1];
+                        bkSeat[j] = bkSeat[j + 1];
+                        bkPax[j] = bkPax[j + 1];
                     }
 
-                    bookingCount--;
+                    bkCnt--;
 
                     cout << "Booking Cancelled Successfully" << endl;
 
@@ -243,9 +261,9 @@ int main()
         else if (choice == 5)
         {
             cout << "\nEnter Flight Number: ";
-            int num = getIntInput();
+            int fltNo = getIntInput();
 
-            int index = findFlight(num);
+            int index = findFlight(fltNo);
 
             if (index == -1)
             {
@@ -261,18 +279,18 @@ int main()
         else if (choice == 6)
         {
             cout << "\nEnter Passenger Name: ";
-            string name;
-            cin >> name;
+            string pax;
+            getline(cin, pax);
 
             bool found = false;
 
-            cout << "\n--- Bookings for " << name << " ---\n";
+            cout << "\n--- Bookings for " << pax << " ---\n";
 
-            for (int i = 0; i < bookingCount; i++)
+            for (int i = 0; i < bkCnt; i++)
             {
-                if (bookingPassenger[i] == name)
+                if (bkPax[i] == pax)
                 {
-                    cout << "PNR: " << bookingPNR[i] << " | Flight: " << bookingFlight[i] << " | Seat: " << bookingSeat[i] << endl;
+                    cout << "PNR: " << bkPnr[i] << " | Flight: " << bkFlt[i] << " | Seat: " << bkSeat[i] << endl;
                     found = true;
                 }
             }
@@ -291,10 +309,6 @@ int main()
             break;
         }
 
-        else
-        {
-            cout << "Invalid Choice\n";
-        }
     }
 
     return 0;
