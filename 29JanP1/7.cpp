@@ -3,13 +3,13 @@
 using namespace std;
 
 void fact(int x){
-    int f = 1;
+    double f = 1;
     for(int i=1;i<=x;i++) f*=i;
     cout << f;
 }
 
 int main(){
-    int a;
+    double a;
     cout << "Enter: ";
     cin >> a;
     fact(a);
